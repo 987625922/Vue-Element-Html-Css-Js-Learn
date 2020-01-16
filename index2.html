@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>常用指令（列表，条件，class与样式的绑定）</title>
+    <script src="https://cdn.bootcss.com/vue/2.6.10/vue.js"></script>
+</head>
+<body>
+<div id="app">
+    <a href="https://www.imooc.com/video/18558">学习地址</a>
+    <div v-if="count > 0">
+        count大于0，count的值是:{{count}}
+    </div>
+    <div v-else-if="count == 0">
+        count=0,count的值是:{{count}}
+    </div>
+    <div v-else>
+        count的值是:{{count}}
+    </div>
+    <div v-show="count == 1">show:{{count}}</div>
+    {{msg}}
+    <!--   item表示列表里的单个item，list1代表的是数据 -->
+    <div v-for="item in list1">{{item}}</div>
+    <div v-for="item in list2">
+<!--        v-bind:style="{'color':'red'}"-->
+        <div v-if="item.age >= 29" v-bind:style="styleMsg">
+            {{item.age}}
+        </div>
+        <div v-else>
+            {{item.name}}
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    new Vue({
+        el:'#app',
+        data:{
+            count:0,
+            msg:'hello vue!!',
+            styleMsg:{
+                color:'red',
+                'text-shadow':'0 0 5px #232323'
+            },
+            list1:[1,2,1,2,1,2,3],
+            list2:[{
+                name:'名字1',
+                age:29
+            },{
+                name:'名字2',
+                age:20
+            }]
+        }
+    })
+</script>
+</html>

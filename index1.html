@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>计算属性和监听器</title>
+    <script src="https://cdn.bootcss.com/vue/2.6.10/vue.js"></script>
+</head>
+<body>
+<div id="app">
+    {{msg}}
+    <p>{{msg1}}</p>
+</div>
+</body>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            msg: 'hello vue!!',
+            another: 'another hello vue!!'
+        },
+        //监听msg标签
+        watch: {
+            msg: function (newval, oldval) {
+                console.log("newval is:" + newval)
+                console.log("oldval is:" + oldval)
+            }
+        },
+        //只要是包含在vue里面的值发生了变化，msg1都会发生变化
+        computed: {
+            msg1: function () {
+                return 'computed:' + this.msg + ',' + this.another
+            }
+        }
+    })
+</script>
+</html>
