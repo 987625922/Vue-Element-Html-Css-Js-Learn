@@ -10,7 +10,7 @@
       密码: <input type="text" v-model="password">
       再次输入密码: <input type="text">
       <button type="button" @click="addUser()">注册</button>
-      <button type="button" @click="cancel()">注册</button>
+      <button type="button" @click="cancel()">取消</button>
     </form>
   </div>
 </template>
