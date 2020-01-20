@@ -3,8 +3,8 @@
     <form v-if="!isReg">
       用户名：<input type="text" v-model="name">
       密码: <input type="text" v-model="password">
-      <button type="button" @click="login()">登录</button>
-      <button type="button" @click="toReg()">注册</button>
+      <el-button type="button" @click="login()">登录</el-button>
+      <el-button type="button" @click="toReg()">注册</el-button>
     </form>
     <form v-else>
       用户名: <input type="text" v-model="name">
@@ -33,7 +33,7 @@
           localStorage.getItem("password") == this.password) {
           this.$router.push('/home')
         }else {
-          alert("账号密码不正确")
+          this.$message.error('账号密码错误')
         }
       },
       addUser() {
@@ -45,7 +45,7 @@
           this.password = ''
           this.isReg = false
         }else {
-          alert("密码不一致")
+          this.$message.error("密码不一致")
         }
       },
       cancel() {
