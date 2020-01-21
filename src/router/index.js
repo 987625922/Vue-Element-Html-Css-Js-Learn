@@ -5,7 +5,8 @@ import Home from '../views/project/Home.vue'
 import Add from '../views/project/Add.vue'
 import Learn from '../views/LearnNavigation'
 import Basic from '../views/List'
-import GetList from '../views/project2/GetList'
+import p2GetList from '../views/project2/GetList'
+import p2Login from '../views/project2/Login'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 
@@ -21,9 +22,14 @@ export default new Router({
       component: Learn
     },
     {
-      path: '/getlist',
-      name: 'getlist',
-      component: GetList
+      path: '/p2/getlist',
+      name: 'p2GetList',
+      component: p2GetList
+    },
+    {
+      path: '/p2/login',
+      name: 'p2login',
+      component: p2Login
     },
     {
       path: '/basic',
