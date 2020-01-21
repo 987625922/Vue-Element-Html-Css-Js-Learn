@@ -6,7 +6,7 @@
         <router-link :to="{name:'list'}">列表</router-link>
       </li>
       <li>
-        <router-link :to="{name:'user'}">个人中心</router-link>
+        <router-link :to="{name:'add'}">个人中心</router-link>
       </li>
     </ul>
   </div>
@@ -18,6 +18,6 @@
   }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 
 </style>
