@@ -14,16 +14,6 @@
         </el-form-item>
       </el-form>
 
-      <el-dialog
-        title="温馨提示"
-        :visible.sync="dialogVisible"
-        width="30%"
-        :before-close="handleClose">
-        <span>请输入账号和密码</span>
-        <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-      </span>
-      </el-dialog>
     </div>
   </div>
 </template>
@@ -31,7 +21,7 @@
 <script>
   export default {
     name: 'Login',
-    data () {
+    data() {
       return {
         form: {
           username: '',
@@ -40,26 +30,23 @@
         // 表单验证，需要在 el-form-item 元素中增加 prop 属性
         rules: {
           username: [
-            { required: true, message: '账号不可为空', trigger: 'blur' }
+            {required: true, message: '账号不可为空', trigger: 'blur'}
           ],
           password: [
-            { required: true, message: '密码不可为空', trigger: 'blur' }
+            {required: true, message: '密码不可为空', trigger: 'blur'}
           ]
-        },
-
-        // 对话框显示和隐藏
-        dialogVisible: false
+        }
       }
     },
     methods: {
-      onSubmit (formName) {
+      onSubmit(formName) {
         // 为表单绑定验证功能
         this.$refs[formName].validate((valid) => {
           if (valid) {
             // 使用 vue-router 路由到指定页面，该方式称之为编程式导航
             this.$router.push('/main')
           } else {
-            this.dialogVisible = true
+            this.$message.error('账号密码不能为空')
             return false
           }
         })
@@ -71,9 +58,6 @@
 <style lang="scss" scoped>
   #login_main {
     height: 100%;
-    padding: 100px 100px 0;
-    box-sizing: border-box;
-    position: relative;
     background-image: url(../../assets/img/bg_gihub_windows.jpg);
   }
 
