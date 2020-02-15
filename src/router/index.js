@@ -8,6 +8,7 @@ import Basic from '../views/List'
 import p2GetList from '../views/project2/GetList'
 import p2Login from '../views/project2/Login'
 import p2Register from '../views/project2/Register'
+import p2Home from '../views/project2/Home'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 
@@ -36,6 +37,11 @@ export default new Router({
       path: '/p2/register',
       name: 'p2register',
       component: p2Register
+    },
+    {
+      path: '/p2/Home',
+      name: 'p2home',
+      component: p2Home
     },
     {
       path: '/basic',
