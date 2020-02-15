@@ -43,10 +43,10 @@
       register(){
         this.$axios({
           method:'post',
-          url:'api',
+          url:'http://localhost:8081/admin/register',
           data:this.qs.stringify({    //这里是发送给后台的数据
-            userId:this.userId,
-            token:this.token,
+            phone:this.username,
+            password:this.password,
           })
         }).then(function (res) {
             //此处的this指向的不是当前vue实例

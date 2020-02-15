@@ -45,8 +45,8 @@
         this.$refs[formName].validate((valid) => {
           if (valid) {
             this.$axios.post("http://localhost:8081/admin/login", {
-              phone: formName.username,
-              password: formName.password
+              phone: this.username,
+              password: this.password
             })
               .then(function (res) {
                 //此处的this指向的不是当前vue实例
@@ -95,7 +95,8 @@
     margin: 0 auto 40px auto;
     color: #303133;
   }
-  #register{
+
+  #register {
     color: #ffffff;
   }
 </style>
