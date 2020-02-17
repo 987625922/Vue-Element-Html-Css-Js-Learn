@@ -20,6 +20,8 @@
 </template>
 
 <script>
+  import store from '@/store'
+
   export default {
     name: 'Login',
     data() {
@@ -49,7 +51,8 @@
         }).then(function (res) {
           if (res.data.code == 200) {
             _this.$message.success("登录成功")
-            _this.$router.push('Home')
+            store.commit('setUserId', res.data.data.id)
+            _this.$router.push('Main')
           } else {
             _this.$message.error(res.data.msg);
           }

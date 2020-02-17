@@ -8,7 +8,6 @@ import Basic from '../views/List'
 import p2GetList from '../views/project2/GetList'
 import p2Login from '../views/project2/Login'
 import p2Register from '../views/project2/Register'
-import p2Home from '../views/project2/Home'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 
@@ -39,9 +38,21 @@ export default new Router({
       component: p2Register
     },
     {
-      path: '/p2/Home',
-      name: 'p2home',
-      component: p2Home
+      path: '/p2/home',
+      component: () => import(/* webpackChunkName: "home" */ '../views/project2/main/Home'),
+      meta: { title: '自述文件' },
+      children: [
+        {
+          path: '/p2/main',
+          component: () => import(/* webpackChunkName: "dashboard" */ '../views/project2/page/Main.vue'),
+          meta: { title: '系统首页' }
+        },
+        {
+          path: '/p2/people',
+          component: () => import( '../views/project2/page/People.vue'),
+          meta: { title: '个人中心' }
+        }
+      ]
     },
     {
       path: '/basic',
