@@ -6,7 +6,7 @@
           <div class="user-info">
             <img src="../../../assets/img/default.jpg" class="user-avator" alt/>
             <div class="user-info-cont">
-              <div class="user-info-name">{{name}}</div>
+              <div class="user-info-name">{{this.$store.state.username}}</div>
               <div>{{role}}</div>
             </div>
           </div>
@@ -105,7 +105,6 @@
     name: 'main',
     data() {
       return {
-        name: store.state.username,
         account: "",
         role: "",
         options2: {

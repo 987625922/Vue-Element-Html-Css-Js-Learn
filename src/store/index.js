@@ -6,7 +6,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     count: 0,
-    userId: "-1",
+    userId: "1",
     lists: [],
     username: "用户名"
   },

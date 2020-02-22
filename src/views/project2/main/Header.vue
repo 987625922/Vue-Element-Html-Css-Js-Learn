@@ -34,13 +34,11 @@
         <!-- 用户名下拉菜单 -->
         <el-dropdown class="user-name" trigger="click" @command="handleCommand">
                     <span class="el-dropdown-link">
-                        {{username}}
+                        {{this.$store.state.username}}
                         <i class="el-icon-caret-bottom"></i>
                     </span>
           <el-dropdown-menu slot="dropdown">
-            <a href="https://github.com/lin-xin/vue-manage-system" target="_blank">
-              <el-dropdown-item>项目仓库</el-dropdown-item>
-            </a>
+            <el-dropdown-item divided command="userinfo">个人中心</el-dropdown-item>
             <el-dropdown-item divided command="loginout">退出登录</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
@@ -54,11 +52,9 @@
 
   export default {
     data() {
-      var _this = this;
       return {
         collapse: false,
         fullscreen: false,
-        name: store.state.username,
         message: 2
       };
     },
@@ -74,6 +70,8 @@
         if (command == 'loginout') {
           store.commit('setUserId', "-1")
           this.$router.push('Login')
+        } else if (command == 'userinfo') {
+          this.$router.push('People')
         }
       },
       // 侧边栏折叠
