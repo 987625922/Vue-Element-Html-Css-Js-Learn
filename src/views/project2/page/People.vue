@@ -10,31 +10,110 @@
                      multiple="multiplt"/>
             </div>
           </div>
-          <el-button style="margin-left: 50px;width: 100px;margin-top: 30px">编辑资料</el-button>
+          <el-button v-on:click="showEditDialog()" class="edit">编辑资料</el-button>
         </el-col>
         <el-col :span="12">
           <div class="userInfo">
-            <div><i class="el-icon-user userFont"> 账号：</i>
+            <div><i class="el-icon-user userFont"> 账号：{{phone}}</i>
             </div>
-            <div><i class="el-icon-s-custom userFont"> 用户名：</i>
+            <div><i class="el-icon-s-custom userFont"> 用户名：{{username}}</i>
             </div>
-            <div><i class="el-icon-male userFont"> 性别：</i>
+            <div><i class="el-icon-male userFont"> 性别：{{sexText}}</i>
             </div>
-            <div><i class="el-icon-printer userFont"> 邮箱：</i>
+            <div><i class="el-icon-printer userFont"> 邮箱：{{email}}</i>
             </div>
-            <div><i class="el-icon-tickets userFont"> 简介：</i>
+            <div><i class="el-icon-tickets userFont"> 简介：{{usernote}}</i>
             </div>
           </div>
         </el-col>
       </el-row>
     </el-card>
-    <el-dialog title="裁剪图片" :visible.sync="dialogVisible" width="30%">
+    <el-dialog title="裁剪图片" :visible.sync="cropImgDialogVisible" width="30%">
       <vue-cropper ref='cropper' :src="imgSrc" :ready="cropImage" :zoom="cropImage" :cropmove="cropImage"
                    style="width:100%;height:300px;"></vue-cropper>
       <span slot="footer" class="dialog-footer">
                     <el-button @click="cancelCrop">取 消</el-button>
                     <el-button type="primary" @click="update">确 定</el-button>
                 </span>
+    </el-dialog>
+    <el-dialog
+      title="个人信息修改"
+      :visible.sync="editdialogVisible"
+      width="50%">
+      <el-row class="editUserItem">
+        <el-col :span="3" class="editUserItemLeft"><span>用户名：</span></el-col>
+        <el-col :span="12">
+          <el-input
+            size="small"
+            v-model="username"
+            clearable>
+          </el-input>
+        </el-col>
+      </el-row>
+      <el-row class="editUserItem">
+        <el-col :span="3" class="editUserItemLeft"><span>邮箱：</span></el-col>
+        <el-col :span="12">
+          <el-input
+            size="small"
+            v-model="email"
+            clearable>
+          </el-input>
+        </el-col>
+      </el-row>
+      <el-row class="editUserItem">
+        <el-col :span="3" class="editUserItemLeft"><span>性别：</span></el-col>
+        <el-col :span="12">
+          <el-radio v-model="sex" label="1">男</el-radio>
+          <el-radio v-model="sex" label="2">女</el-radio>
+          <el-radio v-model="sex" label="0">保密</el-radio>
+        </el-col>
+      </el-row>
+      <el-row class="editUserItem">
+        <el-col :span="3" class="editUserItemLeft"><span>备注：</span></el-col>
+        <el-col :span="12">
+          <el-input
+            size="small"
+            v-model="usernote"
+            type="textarea"
+            :autosize="{ minRows: 2, maxRows: 4}"
+            clearable>
+          </el-input>
+        </el-col>
+      </el-row>
+      <span slot="footer" class="dialog-footer">
+            <el-button @click="changePassword">修改密码</el-button>
+    <el-button @click="cancelEdit">取 消</el-button>
+    <el-button type="primary" @click="enterEdit">确 定</el-button>
+  </span>
+    </el-dialog>
+    <el-dialog
+      title="修改密码"
+      :visible.sync="changPasswordDialog"
+      width="50%">
+      <el-row class="editUserItem">
+        <el-col :span="3" class="editUserItemLeft"><span>老密码：</span></el-col>
+        <el-col :span="12">
+          <el-input
+            size="small"
+            v-model="oldpassword"
+            clearable>
+          </el-input>
+        </el-col>
+      </el-row>
+      <el-row class="editUserItem">
+        <el-col :span="3" class="editUserItemLeft"><span>新密码：</span></el-col>
+        <el-col :span="12">
+          <el-input
+            size="small"
+            v-model="newpassword"
+            clearable>
+          </el-input>
+        </el-col>
+      </el-row>
+      <span slot="footer" class="dialog-footer">
+    <el-button @click="cancelChangePassword">取 消</el-button>
+    <el-button type="primary" @click="enterChangePassword">确 定</el-button>
+  </span>
     </el-dialog>
   </div>
 </template>
@@ -51,8 +130,18 @@
         fileList: [],
         imgSrc: '',
         cropImg: '',
-        dialogVisible: false,
-        file: ''
+        cropImgDialogVisible: false,
+        editdialogVisible: false,
+        changPasswordDialog: false,
+        file: '',
+        phone: '',
+        username: '',
+        sex: '',
+        sexText: '',
+        email: '',
+        usernote: '',
+        oldpassword:'',
+        newpassword:''
       }
     },
     components: {
@@ -73,7 +162,7 @@
         }
         const reader = new FileReader();
         reader.onload = (event) => {
-          this.dialogVisible = true;
+          this.cropImgDialogVisible = true;
           this.imgSrc = event.target.result;
           this.$refs.cropper && this.$refs.cropper.replace(event.target.result);
         };
@@ -83,11 +172,11 @@
         this.cropImg = this.$refs.cropper.getCroppedCanvas().toDataURL();
       },
       cancelCrop() {
-        this.dialogVisible = false;
+        this.cropImgDialogVisible = false;
         this.cropImg = this.defaultSrc;
       },
       update() {
-        this.dialogVisible = false;
+        this.cropImgDialogVisible = false;
         this.submitAddFile()
       },
       submitAddFile() {
@@ -110,8 +199,72 @@
           }
         }).then(function (res) {
           if (res.data.code == 200) {
-            store.commit('setUserName', res.data.data.userName)
-            _this.account = res.data.data.phone
+            _this.phone = res.data.data.phone
+            _this.username = res.data.data.userName
+            _this.sex = res.data.data.sex.toString()
+            if (res.data.data.sex == 1) {
+              _this.sexText = '男'
+            } else if (res.data.data.sex == 2) {
+              _this.sexText = '女'
+            } else {
+              _this.sexText = '保密'
+            }
+            _this.email = res.data.data.email
+            _this.note = res.data.data.note
+          } else {
+            _this.$message.error(res.data.msg);
+          }
+        }).catch(function (err) {
+          _this.$message.error(err.data)
+        })
+      },
+      showEditDialog() {
+        this.editdialogVisible = true;
+      },
+      enterEdit() {
+        this.editdialogVisible = false;
+        var _this = this;
+        this.$axios.post("http://localhost:8081/admin/editinfo", {
+          id: store.state.userId,
+          userName: _this.username,
+          email: _this.email,
+          sex: _this.sex,
+          note: _this.usernote
+        }).then(function (res) {
+          if (res.data.code == 200) {
+            _this.getUername();
+          } else {
+            _this.$message.error(res.data.msg);
+          }
+        }).catch(function (err) {
+          _this.$message.error(err.data)
+        })
+      },
+      cancelEdit() {
+        this.editdialogVisible = false;
+        this.getUername();
+      },
+      changePassword() {
+        this.changPasswordDialog = true;
+        this.editdialogVisible = false;
+      },
+      cancelChangePassword(){
+        this.changPasswordDialog = false;
+      },
+      enterChangePassword(){
+        this.changPasswordDialog = false;
+        var _this = this;
+        let formData = new FormData();
+        formData.append("id",store.state.userId);
+        formData.append('oldPassword', this.oldpassword);
+        formData.append("newPassword", this.newpassword);
+        let config = {
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+        };
+        this.$axios.post("http://localhost:8081/admin/updatepassword",formData,config
+        ).then(function (res) {
+          if (res.data.code == 200) {
+            _this.$message.success(res.data.msg);
           } else {
             _this.$message.error(res.data.msg);
           }
@@ -182,5 +335,21 @@
     font-style: normal;
     color: #afb3bf;
     margin-bottom: 15px;
+  }
+
+  .edit {
+    margin-left: 50px;
+    width: 100px;
+    margin-top: 30px;
+  }
+
+  .editUserItemLeft {
+    padding-left: 15px;
+    margin-top: 5px;
+  }
+
+  .editUserItem {
+    margin-bottom: 10px;
+    padding-left: 15px;
   }
 </style>
