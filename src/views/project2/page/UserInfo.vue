@@ -123,7 +123,7 @@
   import store from '@/store'
 
   export default {
-    name: 'People',
+    name: 'UserInfo',
     data: function () {
       return {
         defaultSrc: require('../../../assets/img/default.jpg'),

@@ -48,12 +48,12 @@ export default new Router({
           meta: { title: '系统首页' }
         },
         {
-          path: '/p2/people',
-          component: () => import( '../views/project2/page/People.vue'),
+          path: '/p2/userinfo',
+          component: () => import( '../views/project2/page/UserInfo.vue'),
           meta: { title: '个人中心' }
         },
         {
-          path: '/p2/system/user',
+          path: '/p2/systemuser',
           component: () => import( '../views/project2/page/SystemUser.vue'),
           meta: { title: '用户管理' }
         }

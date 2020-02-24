@@ -69,13 +69,13 @@
             title: '系统管理',
             subs: [
               {
-                index: 'system/user',
+                index: 'systemuser',
                 title: '用户管理'
               }]
           }
           , {
             icon: 'el-icon-lx-people',
-            index: 'people',
+            index: 'userinfo',
             title: '个人中心'
           }
 
