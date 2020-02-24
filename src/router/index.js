@@ -51,6 +51,11 @@ export default new Router({
           path: '/p2/people',
           component: () => import( '../views/project2/page/People.vue'),
           meta: { title: '个人中心' }
+        },
+        {
+          path: '/p2/system/user',
+          component: () => import( '../views/project2/page/SystemUser.vue'),
+          meta: { title: '用户管理' }
         }
       ]
     },
