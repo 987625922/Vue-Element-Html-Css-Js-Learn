@@ -27,9 +27,8 @@
       >
         <el-table-column type="selection" width="55" align="center"></el-table-column>
         <el-table-column prop="id" label="ID" width="55" align="center"></el-table-column>
-        <el-table-column prop="name" label="账号"></el-table-column>
-        <el-table-column label="用户名">
-          <template slot-scope="scope">{{scope.row.money}}</template>
+        <el-table-column prop="phone" label="账号"></el-table-column>
+        <el-table-column label="用户名" prop="userName">
         </el-table-column>
         <el-table-column label="头像(查看大图)" align="center">
           <template slot-scope="scope">
@@ -49,12 +48,11 @@
             </el-tag>
           </template>
         </el-table-column>
-
-        <el-table-column prop="date" label="注册时间"></el-table-column>
-        <el-table-column prop="date" label="邮箱"></el-table-column>
-        <el-table-column prop="date" label="性别"></el-table-column>
-        <el-table-column prop="date" label="备注"></el-table-column>
-        <el-table-column prop="date" label="修改时间"></el-table-column>
+        <el-table-column prop="email" label="邮箱"></el-table-column>
+        <el-table-column prop="sex" label="性别"></el-table-column>
+        <el-table-column prop="note" label="备注"></el-table-column>
+        <el-table-column prop="createTime" label="注册时间"></el-table-column>
+        <el-table-column prop="modifyTime" label="修改时间"></el-table-column>
         <el-table-column label="操作" width="180" align="center" fixed="right">
           <template slot-scope="scope">
             <el-button
@@ -129,12 +127,33 @@
     },
     methods: {
       getData() {
+        // var _this = this;
+        // this.$axios.post("http://localhost:8081/admin/lists", {}).then(function (res) {
+        //   if (res.data.code == 200) {
+        //     console.log(res.data.data)
+        //     this.tableData = res.data.data;
+        //     // this.pageTotal = res.pageTotal || 50;
+        //   } else {
+        //     _this.$message.error(res.data.msg);
+        //   }
+        // }).catch(function (err) {
+        //   _this.$message.error(err.data)
+        // })
         var _this = this;
-        this.$axios.post("http://localhost:8081/admin/lists", {}).then(function (res) {
+        let formData = new FormData();
+        formData.append('page', 1);
+        formData.append("limits", 3);
+        let config = {
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+        };
+        this.$axios.post("http://localhost:8081/admin/lists", formData, config
+        ).then(function (res) {
           if (res.data.code == 200) {
-            console.log(res.data.data.list)
-            this.tableData = res.data.data;
-            // this.pageTotal = res.pageTotal || 50;
+            _this.$message.success(res.data.msg);
+            console.log(res.data.data.lists)
+            _this.tableData = res.data.data.lists;
+            console.log(_this.tableData.size)
+
           } else {
             _this.$message.error(res.data.msg);
           }
@@ -230,7 +249,7 @@
   }
 
   .refresh {
-    position:fixed;
+    position: fixed;
     /*align-self: flex-end;*/
     right: 80px;
   }
