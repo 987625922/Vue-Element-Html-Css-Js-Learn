@@ -15,6 +15,7 @@
         </el-select>
         <el-input v-model="query.name" placeholder="用户名" class="handle-input mr10"></el-input>
         <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
+        <el-button type="primary" icon="el-icon-plus" @click="adddialogVisible = true" circle class="add"></el-button>
         <el-button type="primary" icon="el-icon-refresh" @click="getData" circle class="refresh"></el-button>
       </div>
       <el-table
@@ -27,15 +28,15 @@
       >
         <el-table-column type="selection" width="55" align="center"></el-table-column>
         <el-table-column prop="id" label="ID" width="55" align="center"></el-table-column>
-        <el-table-column prop="phone" label="账号"></el-table-column>
+        <el-table-column prop="account" label="账号"></el-table-column>
         <el-table-column label="用户名" prop="userName">
         </el-table-column>
         <el-table-column label="头像(查看大图)" align="center">
           <template slot-scope="scope">
             <el-image
               class="table-td-thumb"
-              :src="scope.row.thumb"
-              :preview-src-list="[scope.row.thumb]"
+              :src="scope.row.coverImg"
+              :preview-src-list="[scope.row.coverImg]"
             ></el-image>
           </template>
         </el-table-column>
@@ -43,7 +44,7 @@
         <el-table-column label="状态" align="center">
           <template slot-scope="scope">
             <el-tag
-              :type="scope.row.state==='成功'?'success':(scope.row.state==='失败'?'danger':'')"
+              :type="scope.row.state==='1'?'success':(scope.row.state==='2'?'danger':'')"
             >{{scope.row.state}}
             </el-tag>
           </template>
@@ -98,6 +99,56 @@
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
             </span>
     </el-dialog>
+
+    <el-dialog
+      title="添加用户"
+      :visible.sync="adddialogVisible"
+      width="50%">
+      <el-row class="editUserItem">
+      <el-col :span="3" class="editUserItemLeft"><span>账号：</span></el-col>
+      <el-col :span="12">
+        <el-input
+          size="small"
+          v-model="account"
+          clearable>
+        </el-input>
+      </el-col>
+    </el-row>
+      <el-row class="editUserItem">
+        <el-col :span="3" class="editUserItemLeft"><span>密码：</span></el-col>
+        <el-col :span="12">
+          <el-input
+            size="small"
+            v-model="password"
+            clearable>
+          </el-input>
+        </el-col>
+      </el-row>
+      <el-row class="editUserItem" style="margin-top: 50px">
+        <el-col :span="3" class="editUserItemLeft"><span>身份：</span></el-col>
+        <el-col :span="12">
+          <el-radio v-model="identity" label="2">访客</el-radio>
+          <el-radio v-model="identity" label="1">管理员</el-radio>
+          <el-radio v-model="identity" label="0">超级管理员</el-radio>
+        </el-col>
+      </el-row>
+      <el-row class="editUserItem">
+        <el-col :span="3" class="editUserItemLeft"><span>备注：</span></el-col>
+        <el-col :span="12">
+          <el-input
+            size="small"
+            v-model="usernote"
+            type="textarea"
+            :autosize="{ minRows: 2, maxRows: 4}"
+            clearable>
+          </el-input>
+        </el-col>
+      </el-row>
+      <span slot="footer" class="dialog-footer">
+    <el-button @click="adddialogVisible = false">取 消</el-button>
+    <el-button type="primary" @click="adduser">确 定</el-button>
+  </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -112,6 +163,11 @@
           pageIndex: 1,
           pageSize: 10
         },
+        account:"",
+        password:"",
+        identity:1,
+        usernote:"",
+        adddialogVisible:false,
         tableData: [],
         multipleSelection: [],
         delList: [],
@@ -126,6 +182,24 @@
       this.getData();
     },
     methods: {
+      adduser(){
+        var _this = this;
+        this.$axios.post("http://localhost:8081/admin/adduser", {
+          account:_this.account,
+          password:_this.password,
+          isAdaim:_this.identity,
+          note:_this.usernote
+        }).then(function (res) {
+          if (res.data.code == 200) {
+            _this.getUername();
+          } else {
+            _this.$message.error(res.data.msg);
+          }
+        }).catch(function (err) {
+          _this.$message.error(err.data)
+        })
+        _this.adddialogVisible = false
+      },
       getData() {
         // var _this = this;
         // this.$axios.post("http://localhost:8081/admin/lists", {}).then(function (res) {
@@ -247,10 +321,29 @@
     width: 40px;
     height: 40px;
   }
-
+  .add {
+    position: fixed;
+    /*align-self: flex-end;*/
+    right: 130px;
+  }
   .refresh {
     position: fixed;
     /*align-self: flex-end;*/
     right: 80px;
+  }
+  .edit {
+    margin-left: 50px;
+    width: 100px;
+    margin-top: 30px;
+  }
+
+  .editUserItemLeft {
+    padding-left: 15px;
+    margin-top: 5px;
+  }
+
+  .editUserItem {
+    margin-bottom: 10px;
+    padding-left: 15px;
   }
 </style>
