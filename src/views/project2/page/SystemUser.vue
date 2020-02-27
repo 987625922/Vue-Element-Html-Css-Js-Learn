@@ -40,20 +40,68 @@
             ></el-image>
           </template>
         </el-table-column>
-        <el-table-column prop="address" label="身份"></el-table-column>
+        <el-table-column prop="address" label="身份">
+          <template slot-scope="scope">
+            <div v-if="scope.row.isAdaim=='0'">
+              超级管理员
+            </div>
+            <div v-else-if="scope.row.isAdaim=='1'">
+              管理员
+            </div>
+            <div v-else-if="scope.row.isAdaim=='2'">
+              访客
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column label="状态" align="center">
           <template slot-scope="scope">
             <el-tag
-              :type="scope.row.state==='1'?'success':(scope.row.state==='2'?'danger':'')"
-            >{{scope.row.state}}
+              :type="scope.row.status=='1'?'success':'danger'"
+            >
+              <div v-if="scope.row.status=='1'">
+                有效
+              </div>
+              <div v-else>
+                禁止
+              </div>
             </el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="email" label="邮箱"></el-table-column>
-        <el-table-column prop="sex" label="性别"></el-table-column>
+        <el-table-column prop="sex" label="性别">
+          <template slot-scope="scope">
+            <div v-if="scope.row.sex==0">
+              保密
+            </div>
+            <div v-else-if="scope.row.sex==1">
+              男
+            </div>
+            <div v-else-if="scope.row.sex==2">
+              女
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column prop="note" label="备注"></el-table-column>
-        <el-table-column prop="createTime" label="注册时间"></el-table-column>
-        <el-table-column prop="modifyTime" label="修改时间"></el-table-column>
+        <el-table-column label="注册时间" align="center">
+          <template slot-scope="scope">
+            <div v-if="scope.row.createTime !== null">
+              {{ timestampToTime( parseInt(scope.row.createTime)) }}
+            </div>
+            <div v-else>
+              空
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="修改时间" align="center">
+          <template slot-scope="scope">
+            <div v-if="scope.row.modifyTime !== null">
+              {{ timestampToTime( parseInt(scope.row.modifyTime)) }}
+            </div>
+            <div v-else>
+              空
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="180" align="center" fixed="right">
           <template slot-scope="scope">
             <el-button
@@ -87,12 +135,21 @@
     <!-- 编辑弹出框 -->
     <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
       <el-form ref="form" :model="form" label-width="70px">
-        <el-form-item label="用户名">
-          <el-input v-model="form.name"></el-input>
-        </el-form-item>
-        <el-form-item label="地址">
-          <el-input v-model="form.address"></el-input>
-        </el-form-item>
+        <el-row class="editUserItem" style="margin-top: 50px">
+          <el-col :span="5" class="editUserItemLeft"><span>身份：</span></el-col>
+          <el-col :span="19" style="margin-top: 5px">
+            <el-radio v-model="identity" label="2">访客</el-radio>
+            <el-radio v-model="identity" label="1">管理员</el-radio>
+            <el-radio v-model="identity" label="0">超级管理员</el-radio>
+          </el-col>
+        </el-row>
+        <el-row class="editUserItem" style="margin-top: 50px">
+          <el-col :span="5" class="editUserItemLeft"><span>状态：</span></el-col>
+          <el-col :span="12" style="margin-top: 5px">
+            <el-radio v-model="identity" label="1">禁用</el-radio>
+            <el-radio v-model="identity" label="0">有效</el-radio>
+          </el-col>
+        </el-row>
       </el-form>
       <span slot="footer" class="dialog-footer">
                 <el-button @click="editVisible = false">取 消</el-button>
@@ -105,15 +162,15 @@
       :visible.sync="adddialogVisible"
       width="50%">
       <el-row class="editUserItem">
-      <el-col :span="3" class="editUserItemLeft"><span>账号：</span></el-col>
-      <el-col :span="12">
-        <el-input
-          size="small"
-          v-model="account"
-          clearable>
-        </el-input>
-      </el-col>
-    </el-row>
+        <el-col :span="3" class="editUserItemLeft"><span>账号：</span></el-col>
+        <el-col :span="12">
+          <el-input
+            size="small"
+            v-model="account"
+            clearable>
+          </el-input>
+        </el-col>
+      </el-row>
       <el-row class="editUserItem">
         <el-col :span="3" class="editUserItemLeft"><span>密码：</span></el-col>
         <el-col :span="12">
@@ -163,11 +220,11 @@
           pageIndex: 1,
           pageSize: 10
         },
-        account:"",
-        password:"",
-        identity:1,
-        usernote:"",
-        adddialogVisible:false,
+        account: "",
+        password: "",
+        identity: 1,
+        usernote: "",
+        adddialogVisible: false,
         tableData: [],
         multipleSelection: [],
         delList: [],
@@ -182,16 +239,16 @@
       this.getData();
     },
     methods: {
-      adduser(){
+      adduser() {
         var _this = this;
         this.$axios.post("http://localhost:8081/admin/adduser", {
-          account:_this.account,
-          password:_this.password,
-          isAdaim:_this.identity,
-          note:_this.usernote
+          account: _this.account,
+          password: _this.password,
+          isAdaim: _this.identity,
+          note: _this.usernote
         }).then(function (res) {
           if (res.data.code == 200) {
-            _this.getUername();
+            _this.getData()
           } else {
             _this.$message.error(res.data.msg);
           }
@@ -200,19 +257,17 @@
         })
         _this.adddialogVisible = false
       },
+      timestampToTime(row, column) {
+        var date = new Date(row)
+        var Y = date.getFullYear() + '-'
+        var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-'
+        var D = date.getDate() + ' '
+        var h = date.getHours() + ':'
+        var m = date.getMinutes() + ':'
+        var s = date.getSeconds()
+        return Y + M + D + h + m + s
+      },
       getData() {
-        // var _this = this;
-        // this.$axios.post("http://localhost:8081/admin/lists", {}).then(function (res) {
-        //   if (res.data.code == 200) {
-        //     console.log(res.data.data)
-        //     this.tableData = res.data.data;
-        //     // this.pageTotal = res.pageTotal || 50;
-        //   } else {
-        //     _this.$message.error(res.data.msg);
-        //   }
-        // }).catch(function (err) {
-        //   _this.$message.error(err.data)
-        // })
         var _this = this;
         let formData = new FormData();
         formData.append('page', 1);
@@ -240,6 +295,25 @@
         this.$set(this.query, 'pageIndex', 1);
         this.getData();
       },
+      delUser(index){
+        var _this = this;
+        let formData = new FormData();
+        formData.append('id', this.tableData[index].id);
+        let config = {
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+        };
+        this.$axios.post("http://localhost:8081/admin/deluser", formData, config
+        ).then(function (res) {
+          if (res.data.code == 200) {
+            _this.$message.success('删除成功');
+            _this.getData();
+          } else {
+            _this.$message.error(res.data.msg);
+          }
+        }).catch(function (err) {
+          _this.$message.error(err.data)
+        })
+      },
       // 删除操作
       handleDelete(index, row) {
         // 二次确认删除
@@ -247,8 +321,8 @@
           type: 'warning'
         })
           .then(() => {
-            this.$message.success('删除成功');
-            this.tableData.splice(index, 1);
+            //删除操作
+            this.delUser(index)
           })
           .catch(() => {
           });
@@ -321,16 +395,19 @@
     width: 40px;
     height: 40px;
   }
+
   .add {
     position: fixed;
     /*align-self: flex-end;*/
     right: 130px;
   }
+
   .refresh {
     position: fixed;
     /*align-self: flex-end;*/
     right: 80px;
   }
+
   .edit {
     margin-left: 50px;
     width: 100px;
