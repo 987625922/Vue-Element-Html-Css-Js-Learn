@@ -46,7 +46,7 @@
       register() {
         var _this = this;
         this.$axios.post("http://localhost:8081/admin/login", {
-          phone: this.form.username,
+          account: this.form.username,
           password: this.form.password
         }).then(function (res) {
           if (res.data.code == 200) {

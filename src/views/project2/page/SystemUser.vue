@@ -138,22 +138,22 @@
         <el-row class="editUserItem" style="margin-top: 50px">
           <el-col :span="5" class="editUserItemLeft"><span>身份：</span></el-col>
           <el-col :span="19" style="margin-top: 5px">
-            <el-radio v-model="identity" label="2">访客</el-radio>
-            <el-radio v-model="identity" label="1">管理员</el-radio>
-            <el-radio v-model="identity" label="0">超级管理员</el-radio>
+            <el-radio v-model="identityEdit" label="2">访客</el-radio>
+            <el-radio v-model="identityEdit" label="1">管理员</el-radio>
+            <el-radio v-model="identityEdit" label="0">超级管理员</el-radio>
           </el-col>
         </el-row>
         <el-row class="editUserItem" style="margin-top: 50px">
           <el-col :span="5" class="editUserItemLeft"><span>状态：</span></el-col>
           <el-col :span="12" style="margin-top: 5px">
-            <el-radio v-model="identity" label="1">禁用</el-radio>
-            <el-radio v-model="identity" label="0">有效</el-radio>
+            <el-radio v-model="status" label="1">禁用</el-radio>
+            <el-radio v-model="status" label="0">有效</el-radio>
           </el-col>
         </el-row>
       </el-form>
       <span slot="footer" class="dialog-footer">
                 <el-button @click="editVisible = false">取 消</el-button>
-                <el-button type="primary" @click="saveEdit">确 定</el-button>
+                <el-button type="primary" @click="editUser">确 定</el-button>
             </span>
     </el-dialog>
 
@@ -210,6 +210,8 @@
 </template>
 
 <script>
+  import store from '@/store'
+
   export default {
     name: 'SystemUser',
     data() {
@@ -231,8 +233,10 @@
         editVisible: false,
         pageTotal: 0,
         form: {},
+        status: 0,
         idx: -1,
-        id: -1
+        id: -1,
+        identityEdit: -1
       };
     },
     created() {
@@ -295,7 +299,7 @@
         this.$set(this.query, 'pageIndex', 1);
         this.getData();
       },
-      delUser(index){
+      delUser(index) {
         var _this = this;
         let formData = new FormData();
         formData.append('id', this.tableData[index].id);
@@ -348,10 +352,26 @@
         this.editVisible = true;
       },
       // 保存编辑
-      saveEdit() {
+      editUser() {
         this.editVisible = false;
         this.$message.success(`修改第 ${this.idx + 1} 行成功`);
         this.$set(this.tableData, this.idx, this.form);
+        var _this = this;
+        if (this.identityEdit != -1 && this.status != -1) {
+          this.$axios.post("http://localhost:8081/admin/editinfo", {
+            id: _this.tableData[_this.idx].id,
+            isAdaim: _this.identityEdit,
+            status: _this.status
+          }).then(function (res) {
+            if (res.data.code == 200) {
+              _this.getUername();
+            } else {
+              _this.$message.error(res.data.msg);
+            }
+          }).catch(function (err) {
+            _this.$message.error(err.data)
+          })
+        }
       },
       // 分页导航
       handlePageChange(val) {
