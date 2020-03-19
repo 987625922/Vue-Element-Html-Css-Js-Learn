@@ -22,7 +22,7 @@
         :data="query.tableData"
         border
         class="table"
-        ref="multipleTable"
+        ref="multipleSelection"
         header-cell-class-name="table-header"
         @selection-change="handleSelectionChange"
       >
@@ -343,7 +343,7 @@
             let str = '';
             this.delList = this.delList.concat(this.multipleSelection);
             for (let i = 0; i < length; i++) {
-              str += this.multipleSelection[i].name + ' ';
+              str += this.multipleSelection[i].userName + ' ';
             }
             this.$message.error(`删除了${str}`);
             this.multipleSelection = [];
