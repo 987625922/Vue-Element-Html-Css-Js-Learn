@@ -7,14 +7,14 @@
       </h2>
     </div>
     <el-form ref="loginForm" :model="form" :rules="rules" label-width="60px" class="login-box">
-      <h3 class="login-title">欢迎注册</h3>
-      <el-form-item label="账号" prop="username">
+      <h3 class="login-title">欢迎登录</h3>
+      <el-form-item label="账号" prop="username" style="margin-right: 20px">
         <el-input type="text" placeholder="请输入账号" v-model="form.username"/>
       </el-form-item>
-      <el-form-item label="密码" prop="password">
-        <el-input type="password" placeholder="请输入密码" v-model="form.password"/>
+      <el-form-item label="密码" prop="password" style="margin-right: 20px">
+        <el-input  type="password" placeholder="请输入密码" v-model="form.password"/>
       </el-form-item>
-      <el-button id="register-btn" type="primary" v-on:click="register()">登录</el-button>
+      <el-button class="register-btn" type="primary" v-on:click="register()">登录</el-button>
     </el-form>
   </div>
 </template>
@@ -78,7 +78,7 @@
 
   .login-box {
     border: 1px solid #DCDFE6;
-    width: 350px;
+    width: 390px;
     margin: 110px auto;
     padding: 35px 35px 15px 35px;
     border-radius: 5px;
@@ -94,7 +94,7 @@
     color: #303133;
   }
 
-  #register-btn {
+  .register-btn {
     width: 80%;
     margin-left: 15%;
     margin-top: 20px;

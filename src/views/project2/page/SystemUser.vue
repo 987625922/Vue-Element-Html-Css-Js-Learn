@@ -19,7 +19,7 @@
         <el-button type="primary" icon="el-icon-refresh" @click="getData" circle class="refresh"></el-button>
       </div>
       <el-table
-        :data="tableData"
+        :data="query.tableData"
         border
         class="table"
         ref="multipleTable"
@@ -126,7 +126,7 @@
           layout="total, prev, pager, next"
           :current-page="query.pageIndex"
           :page-size="query.pageSize"
-          :total="pageTotal"
+          :total="query.pageTotal"
           @current-change="handlePageChange"
         ></el-pagination>
       </div>
@@ -156,7 +156,7 @@
                 <el-button type="primary" @click="editUser">确 定</el-button>
             </span>
     </el-dialog>
-
+    <!--   添加用户  -->
     <el-dialog
       title="添加用户"
       :visible.sync="adddialogVisible"
@@ -210,7 +210,6 @@
 </template>
 
 <script>
-  import store from '@/store'
 
   export default {
     name: 'SystemUser',
@@ -220,18 +219,18 @@
           address: '',
           name: '',
           pageIndex: 1,
-          pageSize: 10
+          pageTotal: 0,
+          tableData: [],
+          pageSize: 3
         },
         account: "",
         password: "",
         identity: 1,
         usernote: "",
         adddialogVisible: false,
-        tableData: [],
         multipleSelection: [],
         delList: [],
         editVisible: false,
-        pageTotal: 0,
         form: {},
         status: 0,
         idx: -1,
@@ -274,8 +273,8 @@
       getData() {
         var _this = this;
         let formData = new FormData();
-        formData.append('page', 1);
-        formData.append("limits", 3);
+        formData.append('currentPage', _this.query.pageIndex);
+        formData.append("pageSize", _this.query.pageSize);
         let config = {
           headers: {'Content-Type': 'application/x-www-form-urlencoded'}
         };
@@ -283,10 +282,9 @@
         ).then(function (res) {
           if (res.data.code == 200) {
             _this.$message.success(res.data.msg);
-            console.log(res.data.data.lists)
-            _this.tableData = res.data.data.lists;
-            console.log(_this.tableData.size)
-
+            _this.query.tableData = res.data.data.lists;
+            _this.query.pageTotal = res.data.data.totalRows;
+            // _this.query.pageIndex = res.data.data.pageNum;
           } else {
             _this.$message.error(res.data.msg);
           }
@@ -302,7 +300,7 @@
       delUser(index) {
         var _this = this;
         let formData = new FormData();
-        formData.append('id', this.tableData[index].id);
+        formData.append('id', this.query.tableData[index].id);
         let config = {
           headers: {'Content-Type': 'application/x-www-form-urlencoded'}
         };
@@ -310,6 +308,7 @@
         ).then(function (res) {
           if (res.data.code == 200) {
             _this.$message.success('删除成功');
+            this.query.pageIndex = 1
             _this.getData();
           } else {
             _this.$message.error(res.data.msg);
@@ -336,14 +335,22 @@
         this.multipleSelection = val;
       },
       delAllSelection() {
-        const length = this.multipleSelection.length;
-        let str = '';
-        this.delList = this.delList.concat(this.multipleSelection);
-        for (let i = 0; i < length; i++) {
-          str += this.multipleSelection[i].name + ' ';
-        }
-        this.$message.error(`删除了${str}`);
-        this.multipleSelection = [];
+        this.$confirm('确定要删除吗？', '提示', {
+          type: 'warning'
+        })
+          .then(() => {
+            const length = this.multipleSelection.length;
+            let str = '';
+            this.delList = this.delList.concat(this.multipleSelection);
+            for (let i = 0; i < length; i++) {
+              str += this.multipleSelection[i].name + ' ';
+            }
+            this.$message.error(`删除了${str}`);
+            this.multipleSelection = [];
+          })
+          .catch(() => {
+          });
+
       },
       // 编辑操作
       handleEdit(index, row) {
@@ -355,11 +362,11 @@
       editUser() {
         this.editVisible = false;
         this.$message.success(`修改第 ${this.idx + 1} 行成功`);
-        this.$set(this.tableData, this.idx, this.form);
+        this.$set(this.query.tableData, this.idx, this.form);
         var _this = this;
         if (this.identityEdit != -1 && this.status != -1) {
           this.$axios.post("http://localhost:8081/admin/editinfo", {
-            id: _this.tableData[_this.idx].id,
+            id: _this.query.tableData[_this.idx].id,
             isAdaim: _this.identityEdit,
             status: _this.status
           }).then(function (res) {
@@ -376,6 +383,7 @@
       // 分页导航
       handlePageChange(val) {
         this.$set(this.query, 'pageIndex', val);
+        // this.query.pageIndex = val
         this.getData();
       }
     }
