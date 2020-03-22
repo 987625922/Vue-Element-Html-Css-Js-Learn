@@ -9,12 +9,12 @@
           @click="delAllSelection"
         >批量删除
         </el-button>
-        <el-select v-model="query.address" placeholder="地址" class="handle-select mr10">
-          <el-option key="1" label="广东省" value="广东省"></el-option>
-          <el-option key="2" label="湖南省" value="湖南省"></el-option>
-        </el-select>
+        <!--        <el-select v-model="query.address" placeholder="地址" class="handle-select mr10">-->
+        <!--          <el-option key="1" label="广东省" value="广东省"></el-option>-->
+        <!--          <el-option key="2" label="湖南省" value="湖南省"></el-option>-->
+        <!--        </el-select>-->
         <el-input v-model="query.name" placeholder="用户名" class="handle-input mr10"></el-input>
-        <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="selectName">搜索</el-button>
         <el-button type="primary" icon="el-icon-plus" @click="adddialogVisible = true" circle class="add"></el-button>
         <el-button type="primary" icon="el-icon-refresh" @click="getData" circle class="refresh"></el-button>
       </div>
@@ -292,11 +292,6 @@
           _this.$message.error(err.data)
         })
       },
-      // 触发搜索按钮
-      handleSearch() {
-        this.$set(this.query, 'pageIndex', 1);
-        this.getData();
-      },
       delUser(index) {
         var _this = this;
         let formData = new FormData();
@@ -342,15 +337,69 @@
             const length = this.multipleSelection.length;
             let str = '';
             this.delList = this.delList.concat(this.multipleSelection);
+            var select = new Array();
             for (let i = 0; i < length; i++) {
               str += this.multipleSelection[i].userName + ' ';
+              select[i] = this.multipleSelection[i].id
             }
+            this.delSelectUser(select)
             this.$message.error(`删除了${str}`);
-            this.multipleSelection = [];
+            // this.multipleSelection = [];
           })
           .catch(() => {
           });
 
+      },
+      delSelectUser(index) {
+        var _this = this;
+        let formData = new FormData();
+        formData.append('ids', index);
+        let config = {
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+        };
+        this.$axios.post("http://localhost:8081/admin/delseluser", formData, config
+        ).then(function (res) {
+          if (res.data.code == 200) {
+            _this.$message.success('删除成功');
+            this.query.pageIndex = 1
+            _this.getData();
+          } else {
+            _this.$message.error(res.data.msg);
+          }
+        }).catch(function (err) {
+          _this.$message.error(err.data)
+        })
+      },
+      // 编辑操作
+      handleEdit(index, row) {
+        this.idx = index;
+        this.form = row;
+        this.editVisible = true;
+      },selectName(){
+        this.query.pageIndex = 1;
+        this.selbyname();
+      },
+      selbyname() {
+        var _this = this;
+        let formData = new FormData();
+        formData.append('name', this.query.name);
+        formData.append('currentPage', _this.query.pageIndex);
+        formData.append("pageSize", _this.query.pageSize);
+        let config = {
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+        };
+        this.$axios.post("http://localhost:8081/admin/selbyname", formData, config
+        ).then(function (res) {
+          if (res.data.code == 200) {
+            _this.$message.success(res.data.msg);
+            _this.query.tableData = res.data.data.lists;
+            _this.query.pageTotal = res.data.data.totalRows;
+          } else {
+            _this.$message.error(res.data.msg);
+          }
+        }).catch(function (err) {
+          _this.$message.error(err.data)
+        })
       },
       // 编辑操作
       handleEdit(index, row) {
@@ -383,8 +432,13 @@
       // 分页导航
       handlePageChange(val) {
         this.$set(this.query, 'pageIndex', val);
-        // this.query.pageIndex = val
-        this.getData();
+        console.log("this.query.name")
+        console.log(this.query.name)
+        if (this.query.name == "") {
+          this.getData();
+        } else {
+          this.selbyname()
+        }
       }
     }
   };
