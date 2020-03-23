@@ -45,7 +45,7 @@
     methods: {
       register() {
         var _this = this;
-        this.$axios.post("http://localhost:8081/admin/login", {
+        this.$axios.post("http://localhost:8081/login", {
           account: this.form.username,
           password: this.form.password
         }).then(function (res) {
