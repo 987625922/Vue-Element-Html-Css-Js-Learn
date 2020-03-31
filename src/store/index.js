@@ -6,9 +6,10 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     count: 0,
-    userId: "1",
+    userId: '1',
     lists: [],
-    username: "用户名"
+    username: '用户名',
+    token: ''
   },
   mutations: {
     increate1 () {
@@ -17,15 +18,17 @@ export default new Vuex.Store({
     addItem (state, value) {
       state.lists.push(value)
     },
-    setUserId(state,id){
+    setUserId (state, id) {
       this.state.userId = id
     },
-    setUserName(state,username){
+    setToken(state, token){
+      this.state.token = token
+    },
+    setUserName (state, username) {
       this.state.username = username
     }
   },
-  getters: {
-  },
+  getters: {},
   actions: {},
   modules: {}
 })

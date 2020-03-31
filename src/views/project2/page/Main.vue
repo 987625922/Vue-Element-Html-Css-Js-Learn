@@ -98,15 +98,15 @@
 </template>
 
 <script>
-  import Schart from 'vue-schart';
+  import Schart from 'vue-schart'
   import store from '@/store'
 
   export default {
     name: 'main',
-    data() {
+    data () {
       return {
-        account: "",
-        role: "",
+        account: '',
+        role: '',
         options2: {
           type: 'line',
           title: {
@@ -120,19 +120,22 @@
             }
           ]
         }
-      };
+      }
     },
     components: {
       Schart
     },
-    mounted() {
+    mounted () {
       //vue的生命周期，每次打开都调用
-      this.getUername();
+      this.getUername()
     },
     methods: {
-      getUername() {
-        var _this = this;
-        this.$axios.get("http://localhost:8081/admin/getInfo", {
+      getUername () {
+        var _this = this
+        this.$axios.get('http://localhost:8081/admin/getInfo', {
+          headers: {
+            'token': store.state.token
+          },
           params: {
             id: store.state.userId
           }
@@ -141,7 +144,7 @@
             store.commit('setUserName', res.data.data.userName)
             _this.account = res.data.data.phone
           } else {
-            _this.$message.error(res.data.msg);
+            _this.$message.error(res.data.msg)
           }
         }).catch(function (err) {
           _this.$message.error(err.data)
@@ -149,7 +152,7 @@
       }
     }
   }
-  ;
+
 </script>
 
 

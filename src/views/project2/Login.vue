@@ -14,7 +14,7 @@
       <el-form-item label="密码" prop="password" style="margin-right: 20px">
         <el-input  type="password" placeholder="请输入密码" v-model="form.password"/>
       </el-form-item>
-      <el-button class="register-btn" type="primary" v-on:click="register()">登录</el-button>
+      <el-button class="register-btn" type="primary" v-on:click="login()">登录</el-button>
     </el-form>
   </div>
 </template>
@@ -43,15 +43,16 @@
       }
     },
     methods: {
-      register() {
+      login() {
         var _this = this;
-        this.$axios.post("http://localhost:8081/pub/login", {
+        this.$axios.post("http://localhost:8081/login", {
           account: this.form.username,
           password: this.form.password
         }).then(function (res) {
           if (res.data.code == 200) {
             _this.$message.success("登录成功")
             store.commit('setUserId', res.data.data.id)
+            store.commit('setToken',res.data.data.token)
             _this.$router.push('Main')
           } else {
             _this.$message.error(res.data.msg);
