@@ -132,7 +132,7 @@
     methods: {
       getUername () {
         var _this = this
-        this.$axios.get('http://localhost:8081/admin/getInfo', {
+        this.$axios.get('http://localhost:8081/user/getInfo', {
           headers: {
             'token': store.state.token
           },

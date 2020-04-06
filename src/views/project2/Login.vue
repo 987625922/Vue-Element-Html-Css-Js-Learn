@@ -96,7 +96,7 @@
   }
 
   .register-btn {
-    width: 80%;
+    width: 70%;
     margin-left: 15%;
     margin-top: 20px;
   }
@@ -110,6 +110,6 @@
   }
 
   .logoText span {
-    margin-left: 20px;
+    margin-left: 30px;
   }
 </style>

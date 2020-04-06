@@ -210,6 +210,7 @@
 </template>
 
 <script>
+  import store from '@/store'
 
   export default {
     name: 'SystemUser',
@@ -244,7 +245,7 @@
     methods: {
       adduser() {
         var _this = this;
-        this.$axios.post("http://localhost:8081/admin/adduser", {
+        this.$axios.post("http://localhost:8081/user/adduser", {
           account: _this.account,
           password: _this.password,
           isAdaim: _this.identity,
@@ -276,9 +277,12 @@
         formData.append('currentPage', _this.query.pageIndex);
         formData.append("pageSize", _this.query.pageSize);
         let config = {
-          headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'token': store.state.token
+          }
         };
-        this.$axios.post("http://localhost:8081/admin/lists", formData, config
+        this.$axios.post("http://localhost:8081/user/lists", formData, config
         ).then(function (res) {
           if (res.data.code == 200) {
             _this.$message.success(res.data.msg);
@@ -299,7 +303,7 @@
         let config = {
           headers: {'Content-Type': 'application/x-www-form-urlencoded'}
         };
-        this.$axios.post("http://localhost:8081/admin/deluser", formData, config
+        this.$axios.post("http://localhost:8081/user/deluser", formData, config
         ).then(function (res) {
           if (res.data.code == 200) {
             _this.$message.success('删除成功');
@@ -357,7 +361,7 @@
         let config = {
           headers: {'Content-Type': 'application/x-www-form-urlencoded'}
         };
-        this.$axios.post("http://localhost:8081/admin/delseluser", formData, config
+        this.$axios.post("http://localhost:8081/user/delseluser", formData, config
         ).then(function (res) {
           if (res.data.code == 200) {
             _this.$message.success('删除成功');
@@ -375,7 +379,7 @@
         this.idx = index;
         this.form = row;
         this.editVisible = true;
-      },selectName(){
+      }, selectName() {
         this.query.pageIndex = 1;
         this.selbyname();
       },
@@ -388,7 +392,7 @@
         let config = {
           headers: {'Content-Type': 'application/x-www-form-urlencoded'}
         };
-        this.$axios.post("http://localhost:8081/admin/selbyname", formData, config
+        this.$axios.post("http://localhost:8081/user/selbyname", formData, config
         ).then(function (res) {
           if (res.data.code == 200) {
             _this.$message.success(res.data.msg);
@@ -414,7 +418,7 @@
         this.$set(this.query.tableData, this.idx, this.form);
         var _this = this;
         if (this.identityEdit != -1 && this.status != -1) {
-          this.$axios.post("http://localhost:8081/admin/editinfo", {
+          this.$axios.post("http://localhost:8081/user/editinfo", {
             id: _this.query.tableData[_this.idx].id,
             isAdaim: _this.identityEdit,
             status: _this.status
