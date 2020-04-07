@@ -53,9 +53,14 @@ export default new Router({
           meta: { title: '个人中心' }
         },
         {
-          path: '/p2/systemuser',
-          component: () => import( '../views/project2/page/SystemUser.vue'),
+          path: '/p2/userlist',
+          component: () => import( '../views/project2/page/UserList.vue'),
           meta: { title: '用户管理' }
+        },
+        {
+          path: '/p2/rolelist',
+          component: () => import( '../views/project2/page/RoleList.vue'),
+          meta: { title: '身份管理' }
         }
       ]
     },

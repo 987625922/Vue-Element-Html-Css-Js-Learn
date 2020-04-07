@@ -69,8 +69,12 @@
             title: '系统管理',
             subs: [
               {
-                index: 'systemuser',
+                index: 'userlist',
                 title: '用户管理'
+              },
+              {
+                index: 'rolelist',
+                title: '身份管理'
               }]
           }
           , {

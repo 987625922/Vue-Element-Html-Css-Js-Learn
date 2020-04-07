@@ -213,7 +213,7 @@
   import store from '@/store'
 
   export default {
-    name: 'SystemUser',
+    name: 'userlist',
     data() {
       return {
         query: {
