@@ -39,14 +39,25 @@
         <div class="addRoleBox">
           <div class="addRoleName">
             角色名称：
-            <el-input v-model="input" class="inputRoleName" ></el-input>
+            <el-input v-model="input" class="inputRoleName"></el-input>
           </div>
         </div>
         <div class="addRoleBox">
           <div class="addRoleName">
-            <i class="tvRoleBox">角色备注：</i>
-            <el-input v-model="textarea" class="inputRoleName"  type="textarea" :rows="5"></el-input>
+            角色备注：
+            <el-input v-model="textarea" class="inputRoleName" type="textarea" :rows="5"></el-input>
           </div>
+        </div>
+        <div class="addRoleBox">
+          角色权限：
+          <el-checkbox-group v-model="permissionList">
+            <el-checkbox label="复选框 A"></el-checkbox>
+            <el-checkbox label="复选框 B"></el-checkbox>
+            <el-checkbox label="复选框 C"></el-checkbox>
+          </el-checkbox-group>
+        </div>
+        <div>
+          <el-button type="primary">保存</el-button>
         </div>
       </el-col>
     </el-row>
@@ -59,7 +70,8 @@
     name: 'rolelist',
     data () {
       return {
-        tableData: []
+        tableData: [],
+        permissionList:[]
       }
     }
   }
@@ -88,10 +100,12 @@
     margin-top: 5px;
     margin-bottom: 5px;
   }
-  .addRoleName{
+
+  .addRoleName {
     margin-left: 55px;
   }
-  .tvRoleBox{
+
+  .tvRoleBox {
     float: top;
   }
 </style>
