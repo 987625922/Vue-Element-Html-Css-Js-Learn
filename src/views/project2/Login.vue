@@ -45,7 +45,7 @@
     methods: {
       login() {
         var _this = this;
-        this.$axios.post("http://localhost:8081/login", {
+        this.$axios.post(store.state.url+"/login", {
           account: this.form.username,
           password: this.form.password
         }).then(function (res) {

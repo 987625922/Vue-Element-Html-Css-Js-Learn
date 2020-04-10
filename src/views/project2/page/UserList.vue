@@ -141,12 +141,13 @@
             <!--            <el-radio v-model="identityEdit" label="2">访客</el-radio>-->
             <!--            <el-radio v-model="identityEdit" label="1">管理员</el-radio>-->
             <!--            <el-radio v-model="identityEdit" label="0">超级管理员</el-radio>-->
-            <el-radio-group v-model="frequencyValue">
+            <el-radio-group v-model="roleIndex">
+<!--              <p v-for="(item,i) in roleList">&#45;&#45;索引值&#45;&#45;{{i}}   &#45;&#45;每一项&#45;&#45;{{item}}</p>-->
               <el-radio
-                @change="roleChange"
-                v-for="week in weekList"
-                :label="week.code"
-                :key="week.code">{{week.name}}
+                @change="roleChange(i,item.id)"
+                v-for="(item,i) in roleList"
+                :label="item.id"
+                :key="item.id">{{item.name}}
               </el-radio>
             </el-radio-group>
           </el-col>
@@ -232,24 +233,10 @@
           tableData: [],
           pageSize: 3
         },
-        weekList: [{
-          code: 1,
-          name: '星期一'
-        }, {
-          code: 2,
-          name: '星期二'
-        }, {
-          code: 3,
-          name: '星期三'
-        }, {
-          code: 4,
-          name: '星期四'
-        }],
-        frequencyValue: 1,
-        roles: ['1', '2', '3'],
+        roleList: [],
+        roleIndex: 1,
         account: '',
         password: '',
-        identity: 1,
         usernote: '',
         adddialogVisible: false,
         multipleSelection: [],
@@ -258,25 +245,29 @@
         form: {},
         status: 0,
         idx: -1,
-        id: -1,
-        identityEdit: -1
       }
     },
     created () {
       this.getData()
     },
     methods: {
-      roleChange () {
-
+      roleChange (row,id) {
+        console.log(id)
       },
       adduser () {
         var _this = this
+        let config = {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'token': store.state.token
+          }
+        }
         this.$axios.post('http://localhost:8081/user/adduser', {
           account: _this.account,
           password: _this.password,
           isAdaim: _this.identity,
           note: _this.usernote
-        }).then(function (res) {
+        }, config).then(function (res) {
           if (res.data.code == 200) {
             _this.getData()
           } else {
@@ -308,7 +299,7 @@
             'token': store.state.token
           }
         }
-        this.$axios.post('http://localhost:8081/user/lists', formData, config
+        this.$axios.post(store.state.url + '/user/lists', formData, config
         ).then(function (res) {
           if (res.data.code == 200) {
             _this.$message.success(res.data.msg)
@@ -327,7 +318,10 @@
         let formData = new FormData()
         formData.append('id', this.query.tableData[index].id)
         let config = {
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'token': store.state.token
+          }
         }
         this.$axios.post('http://localhost:8081/user/deluser', formData, config
         ).then(function (res) {
@@ -374,7 +368,6 @@
             }
             this.delSelectUser(select)
             this.$message.error(`删除了${str}`)
-            // this.multipleSelection = [];
           })
           .catch(() => {
           })
@@ -385,7 +378,10 @@
         let formData = new FormData()
         formData.append('ids', index)
         let config = {
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'token': store.state.token
+          }
         }
         this.$axios.post('http://localhost:8081/user/delseluser', formData, config
         ).then(function (res) {
@@ -416,7 +412,10 @@
         formData.append('currentPage', _this.query.pageIndex)
         formData.append('pageSize', _this.query.pageSize)
         let config = {
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'token': store.state.token
+          }
         }
         this.$axios.post('http://localhost:8081/user/selbyname', formData, config
         ).then(function (res) {
@@ -433,6 +432,7 @@
       },
       // 编辑操作
       handleEdit (index, row) {
+        this.getRoles()
         this.idx = index
         this.form = row
         this.editVisible = true
@@ -443,12 +443,17 @@
         this.$message.success(`修改第 ${this.idx + 1} 行成功`)
         this.$set(this.query.tableData, this.idx, this.form)
         var _this = this
-        if (this.identityEdit != -1 && this.status != -1) {
-          this.$axios.post('http://localhost:8081/user/editinfo', {
+        let config = {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'token': store.state.token
+          }
+        }
+        if (this.status != -1) {
+          this.$axios.post(store.state.url + '/user/editinfo', {
             id: _this.query.tableData[_this.idx].id,
-            isAdaim: _this.identityEdit,
             status: _this.status
-          }).then(function (res) {
+          }, config).then(function (res) {
             if (res.data.code == 200) {
               _this.getUername()
             } else {
@@ -458,6 +463,26 @@
             _this.$message.error(err.data)
           })
         }
+      },
+      //获取身份列表
+      getRoles () {
+        var _this = this
+        let config = {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'token': store.state.token
+          }
+        }
+        this.$axios.get(store.state.url + '/role/lists', config).then(function (res) {
+          if (res.data.code == 200) {
+            _this.roleList = res.data.data
+
+          } else {
+            _this.$message.error(res.data.msg)
+          }
+        }).catch(function (err) {
+          _this.$message.error(err.data)
+        })
       },
       // 分页导航
       handlePageChange (val) {
