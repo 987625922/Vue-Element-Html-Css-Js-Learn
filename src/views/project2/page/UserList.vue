@@ -40,18 +40,18 @@
             ></el-image>
           </template>
         </el-table-column>
-        <el-table-column prop="address" label="身份">
-          <template slot-scope="scope">
-            <div v-if="scope.row.isAdaim=='0'">
-              超级管理员
-            </div>
-            <div v-else-if="scope.row.isAdaim=='1'">
-              管理员
-            </div>
-            <div v-else-if="scope.row.isAdaim=='2'">
-              访客
-            </div>
-          </template>
+        <el-table-column prop="roleName" label="身份" align="center">
+          <!--          <template slot-scope="scope">-->
+          <!--            <div v-if="scope.row.isAdaim=='0'">-->
+          <!--              超级管理员-->
+          <!--            </div>-->
+          <!--            <div v-else-if="scope.row.isAdaim=='1'">-->
+          <!--              管理员-->
+          <!--            </div>-->
+          <!--            <div v-else-if="scope.row.isAdaim=='2'">-->
+          <!--              访客-->
+          <!--            </div>-->
+          <!--          </template>-->
         </el-table-column>
         <el-table-column label="状态" align="center">
           <template slot-scope="scope">
@@ -138,9 +138,17 @@
         <el-row class="editUserItem" style="margin-top: 50px">
           <el-col :span="5" class="editUserItemLeft"><span>身份：</span></el-col>
           <el-col :span="19" style="margin-top: 5px">
-            <el-radio v-model="identityEdit" label="2">访客</el-radio>
-            <el-radio v-model="identityEdit" label="1">管理员</el-radio>
-            <el-radio v-model="identityEdit" label="0">超级管理员</el-radio>
+            <!--            <el-radio v-model="identityEdit" label="2">访客</el-radio>-->
+            <!--            <el-radio v-model="identityEdit" label="1">管理员</el-radio>-->
+            <!--            <el-radio v-model="identityEdit" label="0">超级管理员</el-radio>-->
+            <el-radio-group v-model="frequencyValue">
+              <el-radio
+                @change="roleChange"
+                v-for="week in weekList"
+                :label="week.code"
+                :key="week.code">{{week.name}}
+              </el-radio>
+            </el-radio-group>
           </el-col>
         </el-row>
         <el-row class="editUserItem" style="margin-top: 50px">
@@ -214,7 +222,7 @@
 
   export default {
     name: 'userlist',
-    data() {
+    data () {
       return {
         query: {
           address: '',
@@ -224,10 +232,25 @@
           tableData: [],
           pageSize: 3
         },
-        account: "",
-        password: "",
+        weekList: [{
+          code: 1,
+          name: '星期一'
+        }, {
+          code: 2,
+          name: '星期二'
+        }, {
+          code: 3,
+          name: '星期三'
+        }, {
+          code: 4,
+          name: '星期四'
+        }],
+        frequencyValue: 1,
+        roles: ['1', '2', '3'],
+        account: '',
+        password: '',
         identity: 1,
-        usernote: "",
+        usernote: '',
         adddialogVisible: false,
         multipleSelection: [],
         delList: [],
@@ -237,15 +260,18 @@
         idx: -1,
         id: -1,
         identityEdit: -1
-      };
+      }
     },
-    created() {
-      this.getData();
+    created () {
+      this.getData()
     },
     methods: {
-      adduser() {
-        var _this = this;
-        this.$axios.post("http://localhost:8081/user/adduser", {
+      roleChange () {
+
+      },
+      adduser () {
+        var _this = this
+        this.$axios.post('http://localhost:8081/user/adduser', {
           account: _this.account,
           password: _this.password,
           isAdaim: _this.identity,
@@ -254,14 +280,14 @@
           if (res.data.code == 200) {
             _this.getData()
           } else {
-            _this.$message.error(res.data.msg);
+            _this.$message.error(res.data.msg)
           }
         }).catch(function (err) {
           _this.$message.error(err.data)
         })
         _this.adddialogVisible = false
       },
-      timestampToTime(row, column) {
+      timestampToTime (row, column) {
         var date = new Date(row)
         var Y = date.getFullYear() + '-'
         var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-'
@@ -271,53 +297,53 @@
         var s = date.getSeconds()
         return Y + M + D + h + m + s
       },
-      getData() {
-        var _this = this;
-        let formData = new FormData();
-        formData.append('currentPage', _this.query.pageIndex);
-        formData.append("pageSize", _this.query.pageSize);
+      getData () {
+        var _this = this
+        let formData = new FormData()
+        formData.append('currentPage', _this.query.pageIndex)
+        formData.append('pageSize', _this.query.pageSize)
         let config = {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
             'token': store.state.token
           }
-        };
-        this.$axios.post("http://localhost:8081/user/lists", formData, config
+        }
+        this.$axios.post('http://localhost:8081/user/lists', formData, config
         ).then(function (res) {
           if (res.data.code == 200) {
-            _this.$message.success(res.data.msg);
-            _this.query.tableData = res.data.data.lists;
-            _this.query.pageTotal = res.data.data.totalRows;
+            _this.$message.success(res.data.msg)
+            _this.query.tableData = res.data.data.lists
+            _this.query.pageTotal = res.data.data.totalRows
             // _this.query.pageIndex = res.data.data.pageNum;
           } else {
-            _this.$message.error(res.data.msg);
+            _this.$message.error(res.data.msg)
           }
         }).catch(function (err) {
           _this.$message.error(err.data)
         })
       },
-      delUser(index) {
-        var _this = this;
-        let formData = new FormData();
-        formData.append('id', this.query.tableData[index].id);
+      delUser (index) {
+        var _this = this
+        let formData = new FormData()
+        formData.append('id', this.query.tableData[index].id)
         let config = {
-          headers: {'Content-Type': 'application/x-www-form-urlencoded'}
-        };
-        this.$axios.post("http://localhost:8081/user/deluser", formData, config
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        }
+        this.$axios.post('http://localhost:8081/user/deluser', formData, config
         ).then(function (res) {
           if (res.data.code == 200) {
-            _this.$message.success('删除成功');
+            _this.$message.success('删除成功')
             this.query.pageIndex = 1
-            _this.getData();
+            _this.getData()
           } else {
-            _this.$message.error(res.data.msg);
+            _this.$message.error(res.data.msg)
           }
         }).catch(function (err) {
           _this.$message.error(err.data)
         })
       },
       // 删除操作
-      handleDelete(index, row) {
+      handleDelete (index, row) {
         // 二次确认删除
         this.$confirm('确定要删除吗？', '提示', {
           type: 'warning'
@@ -327,106 +353,106 @@
             this.delUser(index)
           })
           .catch(() => {
-          });
+          })
       },
       // 多选操作
-      handleSelectionChange(val) {
-        this.multipleSelection = val;
+      handleSelectionChange (val) {
+        this.multipleSelection = val
       },
-      delAllSelection() {
+      delAllSelection () {
         this.$confirm('确定要删除吗？', '提示', {
           type: 'warning'
         })
           .then(() => {
-            const length = this.multipleSelection.length;
-            let str = '';
-            this.delList = this.delList.concat(this.multipleSelection);
-            var select = new Array();
+            const length = this.multipleSelection.length
+            let str = ''
+            this.delList = this.delList.concat(this.multipleSelection)
+            var select = new Array()
             for (let i = 0; i < length; i++) {
-              str += this.multipleSelection[i].userName + ' ';
+              str += this.multipleSelection[i].userName + ' '
               select[i] = this.multipleSelection[i].id
             }
             this.delSelectUser(select)
-            this.$message.error(`删除了${str}`);
+            this.$message.error(`删除了${str}`)
             // this.multipleSelection = [];
           })
           .catch(() => {
-          });
+          })
 
       },
-      delSelectUser(index) {
-        var _this = this;
-        let formData = new FormData();
-        formData.append('ids', index);
+      delSelectUser (index) {
+        var _this = this
+        let formData = new FormData()
+        formData.append('ids', index)
         let config = {
-          headers: {'Content-Type': 'application/x-www-form-urlencoded'}
-        };
-        this.$axios.post("http://localhost:8081/user/delseluser", formData, config
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        }
+        this.$axios.post('http://localhost:8081/user/delseluser', formData, config
         ).then(function (res) {
           if (res.data.code == 200) {
-            _this.$message.success('删除成功');
+            _this.$message.success('删除成功')
             this.query.pageIndex = 1
-            _this.getData();
+            _this.getData()
           } else {
-            _this.$message.error(res.data.msg);
+            _this.$message.error(res.data.msg)
           }
         }).catch(function (err) {
           _this.$message.error(err.data)
         })
       },
       // 编辑操作
-      handleEdit(index, row) {
-        this.idx = index;
-        this.form = row;
-        this.editVisible = true;
-      }, selectName() {
-        this.query.pageIndex = 1;
-        this.selbyname();
+      handleEdit (index, row) {
+        this.idx = index
+        this.form = row
+        this.editVisible = true
+      }, selectName () {
+        this.query.pageIndex = 1
+        this.selbyname()
       },
-      selbyname() {
-        var _this = this;
-        let formData = new FormData();
-        formData.append('name', this.query.name);
-        formData.append('currentPage', _this.query.pageIndex);
-        formData.append("pageSize", _this.query.pageSize);
+      selbyname () {
+        var _this = this
+        let formData = new FormData()
+        formData.append('name', this.query.name)
+        formData.append('currentPage', _this.query.pageIndex)
+        formData.append('pageSize', _this.query.pageSize)
         let config = {
-          headers: {'Content-Type': 'application/x-www-form-urlencoded'}
-        };
-        this.$axios.post("http://localhost:8081/user/selbyname", formData, config
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        }
+        this.$axios.post('http://localhost:8081/user/selbyname', formData, config
         ).then(function (res) {
           if (res.data.code == 200) {
-            _this.$message.success(res.data.msg);
-            _this.query.tableData = res.data.data.lists;
-            _this.query.pageTotal = res.data.data.totalRows;
+            _this.$message.success(res.data.msg)
+            _this.query.tableData = res.data.data.lists
+            _this.query.pageTotal = res.data.data.totalRows
           } else {
-            _this.$message.error(res.data.msg);
+            _this.$message.error(res.data.msg)
           }
         }).catch(function (err) {
           _this.$message.error(err.data)
         })
       },
       // 编辑操作
-      handleEdit(index, row) {
-        this.idx = index;
-        this.form = row;
-        this.editVisible = true;
+      handleEdit (index, row) {
+        this.idx = index
+        this.form = row
+        this.editVisible = true
       },
       // 保存编辑
-      editUser() {
-        this.editVisible = false;
-        this.$message.success(`修改第 ${this.idx + 1} 行成功`);
-        this.$set(this.query.tableData, this.idx, this.form);
-        var _this = this;
+      editUser () {
+        this.editVisible = false
+        this.$message.success(`修改第 ${this.idx + 1} 行成功`)
+        this.$set(this.query.tableData, this.idx, this.form)
+        var _this = this
         if (this.identityEdit != -1 && this.status != -1) {
-          this.$axios.post("http://localhost:8081/user/editinfo", {
+          this.$axios.post('http://localhost:8081/user/editinfo', {
             id: _this.query.tableData[_this.idx].id,
             isAdaim: _this.identityEdit,
             status: _this.status
           }).then(function (res) {
             if (res.data.code == 200) {
-              _this.getUername();
+              _this.getUername()
             } else {
-              _this.$message.error(res.data.msg);
+              _this.$message.error(res.data.msg)
             }
           }).catch(function (err) {
             _this.$message.error(err.data)
@@ -434,18 +460,18 @@
         }
       },
       // 分页导航
-      handlePageChange(val) {
-        this.$set(this.query, 'pageIndex', val);
-        console.log("this.query.name")
+      handlePageChange (val) {
+        this.$set(this.query, 'pageIndex', val)
+        console.log('this.query.name')
         console.log(this.query.name)
-        if (this.query.name == "") {
-          this.getData();
+        if (this.query.name == '') {
+          this.getData()
         } else {
           this.selbyname()
         }
       }
     }
-  };
+  }
 </script>
 
 <style scoped>
