@@ -41,17 +41,6 @@
           </template>
         </el-table-column>
         <el-table-column prop="roleName" label="身份" align="center">
-          <!--          <template slot-scope="scope">-->
-          <!--            <div v-if="scope.row.isAdaim=='0'">-->
-          <!--              超级管理员-->
-          <!--            </div>-->
-          <!--            <div v-else-if="scope.row.isAdaim=='1'">-->
-          <!--              管理员-->
-          <!--            </div>-->
-          <!--            <div v-else-if="scope.row.isAdaim=='2'">-->
-          <!--              访客-->
-          <!--            </div>-->
-          <!--          </template>-->
         </el-table-column>
         <el-table-column label="状态" align="center">
           <template slot-scope="scope">
@@ -138,13 +127,8 @@
         <el-row class="editUserItem" style="margin-top: 50px">
           <el-col :span="5" class="editUserItemLeft"><span>身份：</span></el-col>
           <el-col :span="19" style="margin-top: 5px">
-            <!--            <el-radio v-model="identityEdit" label="2">访客</el-radio>-->
-            <!--            <el-radio v-model="identityEdit" label="1">管理员</el-radio>-->
-            <!--            <el-radio v-model="identityEdit" label="0">超级管理员</el-radio>-->
             <el-radio-group v-model="roleIndex">
-<!--              <p v-for="(item,i) in roleList">&#45;&#45;索引值&#45;&#45;{{i}}   &#45;&#45;每一项&#45;&#45;{{item}}</p>-->
               <el-radio
-                @change="roleChange(i,item.id)"
                 v-for="(item,i) in roleList"
                 :label="item.id"
                 :key="item.id">{{item.name}}
@@ -223,7 +207,7 @@
 
   export default {
     name: 'userlist',
-    data () {
+    data() {
       return {
         query: {
           address: '',
@@ -247,14 +231,12 @@
         idx: -1,
       }
     },
-    created () {
-      this.getData()
+    created() {
+      this.getUserList()
     },
     methods: {
-      roleChange (row,id) {
-        console.log(id)
-      },
-      adduser () {
+      //添加用户
+      adduser() {
         var _this = this
         let config = {
           headers: {
@@ -269,7 +251,7 @@
           note: _this.usernote
         }, config).then(function (res) {
           if (res.data.code == 200) {
-            _this.getData()
+            _this.getUserList()
           } else {
             _this.$message.error(res.data.msg)
           }
@@ -278,7 +260,8 @@
         })
         _this.adddialogVisible = false
       },
-      timestampToTime (row, column) {
+      //时间转换
+      timestampToTime(row, column) {
         var date = new Date(row)
         var Y = date.getFullYear() + '-'
         var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-'
@@ -288,7 +271,8 @@
         var s = date.getSeconds()
         return Y + M + D + h + m + s
       },
-      getData () {
+      //获取用户列表
+      getUserList() {
         var _this = this
         let formData = new FormData()
         formData.append('currentPage', _this.query.pageIndex)
@@ -305,7 +289,6 @@
             _this.$message.success(res.data.msg)
             _this.query.tableData = res.data.data.lists
             _this.query.pageTotal = res.data.data.totalRows
-            // _this.query.pageIndex = res.data.data.pageNum;
           } else {
             _this.$message.error(res.data.msg)
           }
@@ -313,7 +296,8 @@
           _this.$message.error(err.data)
         })
       },
-      delUser (index) {
+      //删除用户
+      delUser(index) {
         var _this = this
         let formData = new FormData()
         formData.append('id', this.query.tableData[index].id)
@@ -328,7 +312,7 @@
           if (res.data.code == 200) {
             _this.$message.success('删除成功')
             this.query.pageIndex = 1
-            _this.getData()
+            _this.getUserList()
           } else {
             _this.$message.error(res.data.msg)
           }
@@ -337,7 +321,7 @@
         })
       },
       // 删除操作
-      handleDelete (index, row) {
+      handleDelete(index, row) {
         // 二次确认删除
         this.$confirm('确定要删除吗？', '提示', {
           type: 'warning'
@@ -350,10 +334,10 @@
           })
       },
       // 多选操作
-      handleSelectionChange (val) {
+      handleSelectionChange(val) {
         this.multipleSelection = val
       },
-      delAllSelection () {
+      delAllSelection() {
         this.$confirm('确定要删除吗？', '提示', {
           type: 'warning'
         })
@@ -373,22 +357,23 @@
           })
 
       },
-      delSelectUser (index) {
+      //多选删除
+      delSelectUser(ids) {
         var _this = this
         let formData = new FormData()
-        formData.append('ids', index)
+        formData.append('ids', ids)
         let config = {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
             'token': store.state.token
           }
         }
-        this.$axios.post('http://localhost:8081/user/delseluser', formData, config
+        this.$axios.post('http://localhost:8081/user/delsmoreuser', formData, config
         ).then(function (res) {
           if (res.data.code == 200) {
             _this.$message.success('删除成功')
             this.query.pageIndex = 1
-            _this.getData()
+            _this.getUserList()
           } else {
             _this.$message.error(res.data.msg)
           }
@@ -397,15 +382,16 @@
         })
       },
       // 编辑操作
-      handleEdit (index, row) {
+      handleEdit(index, row) {
         this.idx = index
         this.form = row
         this.editVisible = true
-      }, selectName () {
+      }, selectName() {
         this.query.pageIndex = 1
         this.selbyname()
       },
-      selbyname () {
+      //搜索名字
+      selbyname() {
         var _this = this
         let formData = new FormData()
         formData.append('name', this.query.name)
@@ -431,14 +417,14 @@
         })
       },
       // 编辑操作
-      handleEdit (index, row) {
-        this.getRoles()
+      handleEdit(index, row) {
+        this.getRoles(index)
         this.idx = index
         this.form = row
         this.editVisible = true
       },
       // 保存编辑
-      editUser () {
+      editUser() {
         this.editVisible = false
         this.$message.success(`修改第 ${this.idx + 1} 行成功`)
         this.$set(this.query.tableData, this.idx, this.form)
@@ -455,7 +441,7 @@
             status: _this.status
           }, config).then(function (res) {
             if (res.data.code == 200) {
-              _this.getUername()
+              // _this.getUername()
             } else {
               _this.$message.error(res.data.msg)
             }
@@ -463,10 +449,23 @@
             _this.$message.error(err.data)
           })
         }
+        this.$axios.post(store.state.url + '/user/addRoles', {
+          userId: _this.query.tableData[_this.idx].id,
+          roleIds: _this.roleList[_this.roleIndex].id
+        }, config).then(function (res) {
+          if (res.data.code == 200) {
+            // _this.getUserList()
+          } else {
+            _this.$message.error(res.data.msg)
+          }
+        }).catch(function (err) {
+          _this.$message.error(err.data)
+        })
       },
       //获取身份列表
-      getRoles () {
+      getRoles(index) {
         var _this = this
+        // _this.roleIndex = _this.query.tableData[index].roleid
         let config = {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -475,8 +474,8 @@
         }
         this.$axios.get(store.state.url + '/role/lists', config).then(function (res) {
           if (res.data.code == 200) {
+            _this.roleIndex = _this.query.tableData[index].roleId
             _this.roleList = res.data.data
-
           } else {
             _this.$message.error(res.data.msg)
           }
@@ -485,12 +484,12 @@
         })
       },
       // 分页导航
-      handlePageChange (val) {
+      handlePageChange(val) {
         this.$set(this.query, 'pageIndex', val)
         console.log('this.query.name')
         console.log(this.query.name)
         if (this.query.name == '') {
-          this.getData()
+          this.getUserList()
         } else {
           this.selbyname()
         }
