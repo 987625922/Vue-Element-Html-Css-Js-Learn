@@ -16,7 +16,7 @@
         <el-input v-model="query.name" placeholder="用户名" class="handle-input mr10"></el-input>
         <el-button type="primary" icon="el-icon-search" @click="selectName">搜索</el-button>
         <el-button type="primary" icon="el-icon-plus" @click="adddialogVisible = true" circle class="add"></el-button>
-        <el-button type="primary" icon="el-icon-refresh" @click="getData" circle class="refresh"></el-button>
+        <el-button type="primary" icon="el-icon-refresh" @click="getUserList" circle class="refresh"></el-button>
       </div>
       <el-table
         :data="query.tableData"
@@ -177,9 +177,9 @@
       <el-row class="editUserItem" style="margin-top: 50px">
         <el-col :span="3" class="editUserItemLeft"><span>身份：</span></el-col>
         <el-col :span="12">
-          <el-radio v-model="identity" label="2">访客</el-radio>
-          <el-radio v-model="identity" label="1">管理员</el-radio>
-          <el-radio v-model="identity" label="0">超级管理员</el-radio>
+<!--          <el-radio v-model="identity" label="2">访客</el-radio>-->
+<!--          <el-radio v-model="identity" label="1">管理员</el-radio>-->
+<!--          <el-radio v-model="identity" label="0">超级管理员</el-radio>-->
         </el-col>
       </el-row>
       <el-row class="editUserItem">
@@ -244,10 +244,10 @@
             'token': store.state.token
           }
         }
-        this.$axios.post('http://localhost:8081/user/adduser', {
+        this.$axios.post(store.state.url + '/user/adduser', {
           account: _this.account,
           password: _this.password,
-          isAdaim: _this.identity,
+          // isAdaim: _this.identity,
           note: _this.usernote
         }, config).then(function (res) {
           if (res.data.code == 200) {
@@ -307,7 +307,7 @@
             'token': store.state.token
           }
         }
-        this.$axios.post('http://localhost:8081/user/deluser', formData, config
+        this.$axios.post(store.state.url + '/user/deluser', formData, config
         ).then(function (res) {
           if (res.data.code == 200) {
             _this.$message.success('删除成功')
@@ -368,7 +368,7 @@
             'token': store.state.token
           }
         }
-        this.$axios.post('http://localhost:8081/user/delsmoreuser', formData, config
+        this.$axios.post(store.state.url + '/user/delsmoreuser', formData, config
         ).then(function (res) {
           if (res.data.code == 200) {
             _this.$message.success('删除成功')
@@ -435,32 +435,38 @@
             'token': store.state.token
           }
         }
-        if (this.status != -1) {
-          this.$axios.post(store.state.url + '/user/editinfo', {
-            id: _this.query.tableData[_this.idx].id,
-            status: _this.status
-          }, config).then(function (res) {
+
+        var roleSelectId = new Array()
+        roleSelectId[0] = _this.roleIndex
+
+        let formData = new FormData()
+        formData.append('userId', _this.query.tableData[_this.idx].id)
+        formData.append('roleIds', roleSelectId)
+
+        // if (this.status != -1) {
+          this.$axios.post(store.state.url + '/user/addRoles', formData, config).then(function (res) {
             if (res.data.code == 200) {
-              // _this.getUername()
+
             } else {
               _this.$message.error(res.data.msg)
             }
           }).catch(function (err) {
             _this.$message.error(err.data)
           })
-        }
-        this.$axios.post(store.state.url + '/user/addRoles', {
-          userId: _this.query.tableData[_this.idx].id,
-          roleIds: _this.roleList[_this.roleIndex].id
-        }, config).then(function (res) {
-          if (res.data.code == 200) {
-            // _this.getUserList()
-          } else {
-            _this.$message.error(res.data.msg)
-          }
-        }).catch(function (err) {
-          _this.$message.error(err.data)
-        })
+
+          // this.$axios.post(store.state.url + '/user/editinfo', {
+          //   id: _this.query.tableData[_this.idx].id,
+          //   status: _this.status
+          // }, config).then(function (res) {
+          //   if (res.data.code == 200) {
+          //     // _this.getUername()
+          //   } else {
+          //     _this.$message.error(res.data.msg)
+          //   }
+          // }).catch(function (err) {
+          //   _this.$message.error(err.data)
+          // })
+        // }
       },
       //获取身份列表
       getRoles(index) {
